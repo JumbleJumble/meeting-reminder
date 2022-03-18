@@ -4,26 +4,26 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 
-namespace MeetingReminder
+namespace MeetingReminder;
+
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    private readonly IEventsCache eventsCache;
+
+    public MainWindow(IEventsCache eventsCache)
     {
-        private readonly IEventsListProvider eventsListProvider;
+        InitializeComponent();
+        Loaded += GetEvents;
+        this.eventsCache = eventsCache;
+        DateLabel.Text = DateTime.Today.ToString("d MMMM yyyy");
+    }
 
-        public MainWindow(IEventsListProvider eventsListProvider)
-        {
-            InitializeComponent();
-            this.eventsListProvider = eventsListProvider;
-            Loaded += GetEvents;
-        }
-
-        private async void GetEvents(object sender, RoutedEventArgs e)
-        {
-            var events = await eventsListProvider.GetEventsAsync();
-            EventsList.ItemsSource = events.Items.Select(e => $"{e.Summary} - {e.Start.DateTime}: {e.ConferenceData?.EntryPoints?.FirstOrDefault()?.Uri ?? string.Empty}");
-        }
+    private async void GetEvents(object sender, RoutedEventArgs e)
+    {
+        await eventsCache.RefreshAsync();
+        EventsList.ItemsSource = eventsCache.Events;
     }
 }

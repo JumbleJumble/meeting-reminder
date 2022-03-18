@@ -12,7 +12,7 @@
             <RowDefinition Height="22"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="7th March 2022"/>
+        <TextBlock Grid.Row="0" x:Name="DateLabel"/>
         <ListView Grid.Row="1" x:Name="EventsList"/>
     </Grid>
 </Window>
