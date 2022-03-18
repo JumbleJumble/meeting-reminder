@@ -1,11 +1,5 @@
 ﻿using Autofac;
 using MeetingReminder.Services;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace MeetingReminder;
@@ -30,6 +24,7 @@ public partial class App : Application
         builder.RegisterType<CalendarServiceProvider>().AsImplementedInterfaces();
         builder.RegisterType<EventsListProvider>().AsImplementedInterfaces();
         builder.RegisterType<EventsCache>().AsImplementedInterfaces().SingleInstance();
+        builder.RegisterType<IntervalTimer>().AsImplementedInterfaces();
         return builder.Build();
     }
 
