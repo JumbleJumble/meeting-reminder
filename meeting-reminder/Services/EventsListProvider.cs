@@ -10,7 +10,7 @@ public interface IEventsListProvider
     Task<Events> GetEventsAsync();
 }
 
-internal class EventsListProvider : IEventsListProvider
+public class EventsListProvider : IEventsListProvider
 {
     private readonly ICalendarServiceProvider calendarServiceProvider;
 

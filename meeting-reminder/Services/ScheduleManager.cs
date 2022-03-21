@@ -3,11 +3,21 @@ using System.Collections.Generic;
 
 namespace MeetingReminder.Services
 {
-    internal class ScheduleManager
+    public interface IScheduleManager
     {
+        Action ScheduleRefreshed { get; set; }
+        IEnumerable<EventInfo> UpcomingEvents { get; }
+    }
+
+    public class ScheduleManager
+        : IScheduleManager
+    {
+        public Action ScheduleRefreshed { get; set; }
+
         private static TimeSpan WaitTime = TimeSpan.FromSeconds(10);
         private readonly IEventsCache eventsCache;
         private readonly IIntervalTimer intervalTimer;
+
 
         public ScheduleManager(
             IEventsCache eventsCache,
@@ -15,12 +25,14 @@ namespace MeetingReminder.Services
         {
             this.eventsCache = eventsCache;
             this.intervalTimer = intervalTimer;
+            ScheduleRefreshed = () => { };
             UpdateSchedule();
         }
 
-        private void UpdateSchedule()
+        private async void UpdateSchedule()
         {
-            eventsCache.RefreshAsync();
+            await eventsCache.RefreshAsync();
+            ScheduleRefreshed();
             intervalTimer.Call(UpdateSchedule).In(WaitTime);
         }
 
@@ -28,7 +40,7 @@ namespace MeetingReminder.Services
         {
             get
             {
-                return new List<EventInfo>();
+                return eventsCache.Events;
             }
         }
     }

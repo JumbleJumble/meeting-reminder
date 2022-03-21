@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 
 namespace MeetingReminder.Services;
 
-internal interface ICalendarServiceProvider
+public interface ICalendarServiceProvider
 {
     Task<CalendarService> GetCalendarServiceAsync();
 }
 
-internal class CalendarServiceProvider : ICalendarServiceProvider
+public class CalendarServiceProvider : ICalendarServiceProvider
 {
     const string ApplicationName = "Google Calendar API .NET Quickstart";
     private readonly ICredentialProvider credentialProvider;

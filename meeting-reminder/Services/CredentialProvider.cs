@@ -12,20 +12,26 @@ public interface ICredentialProvider
     Task<UserCredential> GetUserCredentialAsync();
 }
 
-internal class CredentialProvider : ICredentialProvider
+public class CredentialProvider : ICredentialProvider
 {
-    static string[] Scopes = { CalendarService.Scope.CalendarReadonly };
+    private readonly IConfigProvider configProvider;
+    private static readonly string[] scopes = { CalendarService.Scope.CalendarReadonly };
+
+    public CredentialProvider(IConfigProvider configProvider)
+    {
+        this.configProvider = configProvider;
+    }
 
     public async Task<UserCredential> GetUserCredentialAsync()
     {
         UserCredential credential;
 
-        // The file token.json stores the user's access and refresh tokens, and is created
-        // automatically when the authorization flow completes for the first time.
-        string credPath = "token.json";
+        var secretsFile = configProvider.Config.SecretsLocation;
+        var secretsContainer = await GoogleClientSecrets.FromFileAsync(secretsFile);
+        var credPath = "token.json";
         credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-            GoogleClientSecrets.FromFile("credentials.json").Secrets,
-            Scopes,
+            secretsContainer.Secrets,
+            scopes,
             "user",
             CancellationToken.None,
             new FileDataStore(credPath, true));

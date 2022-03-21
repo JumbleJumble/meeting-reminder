@@ -1,0 +1,4 @@
+{
+    "SecretsLocation": "C:\\Users\\jumbl\\secrets\\credentials.json",
+    "AlertMinutesBefore": [10, 1]
+}

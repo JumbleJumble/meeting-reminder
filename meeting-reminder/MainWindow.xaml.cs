@@ -1,27 +1,34 @@
-﻿using MeetingReminder.Services;
-using System;
-using System.Windows;
+﻿using System;
+using System.Diagnostics;
+using MeetingReminder.Services;
 
 namespace MeetingReminder;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
-public partial class MainWindow : Window
+public partial class MainWindow
 {
-    private readonly IEventsCache eventsCache;
+    private readonly IScheduleManager scheduleManager;
 
-    public MainWindow(IEventsCache eventsCache)
+    public MainWindow(
+        IScheduleManager scheduleManager,
+        IAlertsManager alertsManager)
     {
+        this.scheduleManager = scheduleManager;
         InitializeComponent();
-        Loaded += GetEvents;
-        this.eventsCache = eventsCache;
         DateLabel.Text = DateTime.Today.ToString("d MMMM yyyy");
+        scheduleManager.ScheduleRefreshed += ScheduleRefreshed;
+        alertsManager.AlertRaised += AlertRaised;
     }
 
-    private async void GetEvents(object sender, RoutedEventArgs e)
+    private void ScheduleRefreshed()
     {
-        await eventsCache.RefreshAsync();
-        EventsList.ItemsSource = eventsCache.Events;
+        EventsList.ItemsSource = scheduleManager.UpcomingEvents;
+    }
+
+    private void AlertRaised(Alert alert)
+    {
+        Debug.WriteLine(alert);
     }
 }

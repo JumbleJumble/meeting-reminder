@@ -3,13 +3,12 @@ using System.Threading.Tasks;
 
 namespace MeetingReminder.Services;
 
-internal interface IIntervalTimer
+public interface IIntervalTimer
 {
     ITimedCall Call(Action callback);
-    ITimedCall CallAsync(Func<Task> callback);
 }
 
-internal class IntervalTimer
+public class IntervalTimer : IIntervalTimer
 {
     public ITimedCall Call(Action callback)
     {
@@ -17,39 +16,21 @@ internal class IntervalTimer
     }
 }
 
-internal interface ITimedCall
+public interface ITimedCall
 {
-    ITimedCall Every(TimeSpan interval);
     ITimedCall In(TimeSpan interval);
+    ITimedCall At(DateTimeOffset when);
     void Stop();
 }
 
-internal class TimedCall : ITimedCall
+public class TimedCall : ITimedCall
 {
-    private Action callback;
+    private readonly Action callback;
     private bool stopped;
 
     public TimedCall(Action callback)
     {
         this.callback = callback;
-    }
-
-    public ITimedCall Every(TimeSpan interval)
-    {
-        Impl();
-        return this;
-
-        async void Impl()
-        {
-            while (!stopped)
-            {
-                await Task.Delay(interval);
-                if (!stopped)
-                {
-                    callback();
-                }
-            }
-        }
     }
 
     public ITimedCall In(TimeSpan interval)
@@ -65,6 +46,11 @@ internal class TimedCall : ITimedCall
                 callback();
             }
         }
+    }
+
+    public ITimedCall At(DateTimeOffset when)
+    {
+        return In(when - DateTimeOffset.Now);
     }
 
     public void Stop()
